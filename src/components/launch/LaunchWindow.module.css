@@ -72,11 +72,11 @@
 }
 
 .ibActive {
-	color: #3d8bff;
+	color: #6d4fd1;
 }
 
 .ibActive:hover {
-	color: #62a4ff;
+	color: #8b6ae8;
 }
 
 .ibRed {
@@ -182,7 +182,7 @@
 }
 
 .finalizingSpin {
-	color: #3d8bff;
+	color: #6d4fd1;
 	animation: finalizingSpin 0.9s linear infinite;
 }
 

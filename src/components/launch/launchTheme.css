@@ -8,8 +8,8 @@
 	--launch-text-muted: #475569; /* Slate 600 */
 	--launch-label: #64748b; /* Slate 500 - increased contrast */
 	--launch-hover: rgba(0, 0, 0, 0.045);
-	--launch-selected: rgba(109, 79, 209, 0.12); /* Blue 600 at 12% */
-	--launch-accent: #6d4fd1; /* Blue 600 */
+	--launch-selected: rgba(109, 79, 209, 0.12); /* Brand violet at 12% */
+	--launch-accent: #6d4fd1; /* Brand violet */
 	--launch-accent-soft: #f1f5f9; /* Slate 100 */
 	--launch-popover-blur: 40px;
 	--launch-popover-saturate: 200%;
@@ -31,9 +31,9 @@
 	--launch-text-muted: #aab3c7;
 	--launch-label: #8f99b1;
 	--launch-hover: rgba(255, 255, 255, 0.1);
-	--launch-selected: rgba(92, 153, 255, 0.22);
-	--launch-accent: #3d8bff;
-	--launch-accent-soft: #dbeafe;
+	--launch-selected: rgba(109, 79, 209, 0.22);
+	--launch-accent: #8b6ae8;
+	--launch-accent-soft: #2a2145;
 	--launch-bar-bg: rgba(18, 18, 24, 0.97);
 	--launch-bar-border: rgba(255, 255, 255, 0.07);
 	--launch-bar-shadow: 0 10px 30px rgba(0, 0, 0, 0.24), 0 2px 10px rgba(0, 0, 0, 0.12);

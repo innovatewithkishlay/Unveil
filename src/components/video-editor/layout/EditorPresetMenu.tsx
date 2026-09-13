@@ -69,7 +69,7 @@ export function EditorPresetMenu({ t, presets }: Props) {
 							<Button
 								type="submit"
 								size="sm"
-								className="h-9 rounded-xl bg-[#6D4FD1] px-3 text-white hover:bg-[#1d4ed8]"
+								className="h-9 rounded-xl bg-[#6D4FD1] px-3 text-white hover:bg-[#5a3fc0]"
 							>
 								{t("common.actions.save", "Save")}
 							</Button>

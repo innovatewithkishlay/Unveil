@@ -33,7 +33,7 @@ function PopoverContent({
 			sideOffset={sideOffset}
 			className={cn(
 				!unstyled &&
-					"bg-popover text-popover-foreground z-50 w-72 rounded-md border p-4 shadow-md outline-hidden",
+					"bg-editor-dialog text-popover-foreground z-50 w-72 rounded-xl border border-foreground/10 p-4 shadow-[0_16px_40px_-8px_rgba(0,0,0,0.3),0_0_0_1px_rgba(109,79,209,0.05)] outline-hidden",
 				unstyled && "z-50 outline-hidden",
 				animated &&
 					"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 origin-(--radix-popover-content-transform-origin)",

@@ -242,7 +242,7 @@ export function ShortcutsConfigDialog() {
 						</Button>
 						<Button
 							size="sm"
-							className="bg-[#6D4FD1] hover:bg-[#1d4ed8] text-white"
+							className="bg-[#6D4FD1] hover:bg-[#5a3fc0] text-white"
 							onClick={handleSave}
 						>
 							{t("shortcutsConfig.save")}

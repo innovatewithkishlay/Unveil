@@ -111,20 +111,20 @@
 .glassCyan {
 	position: relative;
 	border-radius: 8px;
-	background: #183065;
-	border: 1px solid #1b3a7f;
+	background: #2a2158;
+	border: 1px solid #362d70;
 	transition:
 		background 0.15s ease,
 		border-color 0.15s ease;
 }
 
 .glassCyan:hover {
-	background: #1a387a;
-	border-color: #1e469f;
+	background: #332968;
+	border-color: #4a3d94;
 }
 
 .glassCyan.selected {
-	background: #1c3e89;
+	background: #3b2f78;
 	border-color: #6d4fd1;
 	box-shadow: inset 0 0 0 1.5px #6d4fd1;
 	z-index: 10;
@@ -267,15 +267,15 @@
 }
 
 :global(:root:not(.dark)) .glassCyan {
-	background: linear-gradient(180deg, #dbeafe 0%, #93c5fd 100%);
-	border-color: #60a5fa;
+	background: linear-gradient(180deg, #ede9fe 0%, #c4b5fd 100%);
+	border-color: #a78bfa;
 }
 :global(:root:not(.dark)) .glassCyan:hover {
-	background: linear-gradient(180deg, #bfdbfe 0%, #60a5fa 100%);
-	border-color: #3b82f6;
+	background: linear-gradient(180deg, #ddd6fe 0%, #a78bfa 100%);
+	border-color: #8b5cf6;
 }
 :global(:root:not(.dark)) .glassCyan.selected {
-	background: linear-gradient(180deg, #93c5fd 0%, #3b82f6 100%);
+	background: linear-gradient(180deg, #c4b5fd 0%, #8b5cf6 100%);
 	border-color: #6d4fd1;
 	box-shadow: inset 0 0 0 1.5px #6d4fd1;
 }
