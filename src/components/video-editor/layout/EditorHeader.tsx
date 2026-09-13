@@ -99,6 +99,13 @@ export function EditorHeader(props: Props) {
 				className={`flex items-center justify-self-start gap-1.5 ${headerLeftControlsPaddingClass}`}
 				style={{ WebkitAppRegion: "no-drag" } as CSSProperties}
 			>
+				<img
+					src="/app-icons/unveil-32.png"
+					alt="Unveil"
+					className="mr-1 h-5 w-5 select-none"
+					draggable={false}
+				/>
+				<div className="mr-0.5 h-5 w-px bg-foreground/10" />
 				<Button
 					ref={projectBrowserTriggerRef}
 					type="button"

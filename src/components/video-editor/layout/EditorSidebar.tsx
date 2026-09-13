@@ -48,8 +48,17 @@ export function EditorSidebar({ t, activeSection, setActiveSection, settingsPane
 		[t],
 	);
 	return (
-		<div className="flex flex-shrink-0 gap-1.5">
-			<div className="flex flex-shrink-0 flex-col items-center gap-0.5 px-2 py-2">
+		<div className="flex flex-shrink-0 gap-3">
+			<div className="flex h-full flex-shrink-0 flex-col items-center gap-0.5 rounded-2xl border border-foreground/10 bg-editor-panel px-2 py-3 shadow-xl">
+				<div className="mb-2 flex h-8 w-8 items-center justify-center">
+					<img
+						src="/app-icons/unveil-32.png"
+						alt="Unveil"
+						className="h-6 w-6 select-none"
+						draggable={false}
+					/>
+				</div>
+				<div className="mb-2 h-px w-6 flex-shrink-0 bg-foreground/10" />
 				{sections.map((section) => {
 					const isActive = activeSection === section.id;
 					return (

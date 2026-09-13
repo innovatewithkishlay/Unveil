@@ -419,10 +419,10 @@ const TimelineEditor = forwardRef<TimelineEditorHandle, TimelineEditorProps>(
 		}
 
 		return (
-			<div className="flex-1 min-h-0 flex flex-col bg-editor-bg overflow-hidden">
+			<div className="flex-1 min-h-0 flex flex-col bg-editor-panel rounded-2xl border border-foreground/10 shadow-xl overflow-hidden">
 				<div
 					ref={timelineContainerRef}
-					className="flex-1 min-h-0 overflow-auto bg-editor-bg relative"
+					className="flex-1 min-h-0 overflow-auto bg-editor-panel relative"
 					tabIndex={0}
 					onFocus={() => {
 						isTimelineFocusedRef.current = true;
