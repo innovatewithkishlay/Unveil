@@ -1,0 +1,27 @@
+{
+	"app": {
+		"name": "Unveil",
+		"editorTitle": "Unveil Editor",
+		"subtitle": "Bildschirmaufzeichnung und -bearbeitung",
+		"language": "Sprache",
+		"manageRecordings": "Aufzeichnungsordner öffnen",
+		"companyCredit": "von Kyro Studio"
+	},
+	"actions": {
+		"cancel": "Abbrechen",
+		"close": "Schließen",
+		"export": "Exportieren",
+		"load": "Laden",
+		"redo": "Wiederherstellen",
+		"reset": "Zurücksetzen",
+		"save": "Speichern",
+		"undo": "Rückgängig",
+		"delete": "Löschen",
+		"done": "Fertig"
+	},
+	"errors": {
+		"invalidFileType": "Ungültiger Dateityp",
+		"failedToUploadImage": "Bild konnte nicht hochgeladen werden",
+		"fileReadError": "Beim Lesen der Datei ist ein Fehler aufgetreten."
+	}
+}
