@@ -1,10 +1,6 @@
 语言: [EN](README.md) | 简中
 
 <p align="center">
-  <img width="220" alt="Unveil logo" src="https://github.com/user-attachments/assets/082bb4b0-5fc5-4e9f-abda-55611fd6aded" />
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/macOS%20%7C%20Windows%20%7C%20Linux-111827?style=for-the-badge" alt="macOS Windows Linux" />
   <img src="https://img.shields.io/badge/open%20source-AGPL3.0-6d4fd1?style=for-the-badge" alt="AGPL 3.0 license" />
 </p>
@@ -13,7 +9,7 @@
 Unveil 是我们代理商团队用于展示所构建客户网站与应用的屏幕录制与编辑工具——操作讲解、演示、以及可直接用于作品集的展示视频。
 Unveil 是开源项目 [Recordly](https://www.recordly.dev) 的一个分支，为我们自己的工作流程而调整。
 
-https://github.com/user-attachments/assets/9b66c71d-ac97-49ff-a0c9-63ac26edf2e4
+> Logo 和产品截图即将推出——本分支不会使用 Recordly 的品牌素材。
 
 ---
 
@@ -40,23 +36,11 @@ Unveil 支持：
 ## 自动缩放、光标润色与样式化画面
 Unveil 可以根据操作自动强调重点区域，平滑光标运动，添加动态效果，并将最终画面放进带有壁纸、纯色、渐变、模糊、留白和阴影的样式化边框中。
 
-<p>
-  <img src="./docs/media/feature1.gif" width="450" alt="Unveil cursor and zoom demo video">
-</p>
-
 ## 动态摄像头气泡叠加
 你可以把摄像头素材作为气泡叠加层加入画面，使用预设位置或自定义坐标摆放，支持镜像、阴影和圆角调节，也可以让它跟随缩放变化，保证动态镜头里整体视觉更协调。
 
-<p>
-  <img src="./docs/media/feature2.gif" width="450" alt="Unveil webcam overlay demo video">
-</p>
-
 ## 为演示设计的时间线编辑
 使用拖拽式时间线工具处理缩放、裁剪、变速区域、注释、额外音频区域以及裁切感知编辑，并将工作保存为 `.unveil` 项目文件（旧版 `.recordly` 文件仍可打开），之后随时回来继续编辑。
-
-<p>
-  <img width="450" alt="timeline editor" src="https://github.com/user-attachments/assets/3692bd8f-7b8d-4a93-b696-d17c828487ea" />
-</p>
 
 ## 扩展与市场
 
@@ -149,17 +133,7 @@ Recordly 的设计包含一个社区驱动的扩展系统，可用于添加光�
 
 # 截图
 
-<p align="center">
-  <img src="https://i.postimg.cc/8CrQtGJf/Screenshot-2026-04-30-at-5-11-52-pm.png" width="700" alt="Unveil recording interface screenshot">
-</p>
-
-<p align="center">
-  <img src="https://i.postimg.cc/pLSMfrTM/Screenshot-2026-04-30-at-5-11-45-pm.png" width="700" alt="Unveil editor screenshot">
-</p>
-
-<p align="center">
-  <img src="https://i.postimg.cc/Zn9VY6bg/Screenshot-2026-03-18-at-6-32-59-pm.png" width="700" alt="Unveil timeline screenshot">
-</p>
+Unveil 实际界面的截图将在后续补充——此前这里展示的是 Recordly 自己的截图，并不属于本分支。
 
 ---
 

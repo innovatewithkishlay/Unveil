@@ -1,10 +1,6 @@
 Language: EN | [简中](README.zh-CN.md)
 
 <p align="center">
-  <img width="220" alt="Unveil Logo" src="https://github.com/user-attachments/assets/414b8838-6731-45d4-a815-6e3c0aa1fe52" />
-</p>
-
-<p align="center">
   <img src="https://img.shields.io/badge/macOS%20%7C%20Windows%20%7C%20Linux-111827?style=for-the-badge" alt="macOS Windows Linux" />
   <img src="https://img.shields.io/badge/open%20source-AGPL3.0-6d4fd1?style=for-the-badge" alt="AGPL 3.0 license" />
 </p>
@@ -13,7 +9,7 @@ Language: EN | [简中](README.zh-CN.md)
 Unveil is our agency's screen recorder and editor for presenting the websites and apps we build for clients — walkthroughs, demos, and portfolio-ready showcase videos.
 Unveil is a fork of the open-source [Recordly](https://www.recordly.dev) project, adapted for our own workflow.
 
-<img width="1280" height="720" alt="MP4 to GIF export (4)" src="https://github.com/user-attachments/assets/e6d68606-5fc0-4f70-99cd-7521982dc13b" />
+> Logo and product screenshots coming soon — this fork doesn't reuse Recordly's branding assets.
 
 ---
 
@@ -40,23 +36,11 @@ Platform notes:
 ## Auto-zooms, cursor polish, and styled frames
 Unveil can automatically emphasize activity with zoom suggestions, smooth cursor movement, add motion effects, and place the final composition inside a styled frame with wallpapers, colors, gradients, blur, padding, and shadows.
 
-<p>
-  <img src="./docs/media/feature1.gif" width="450" alt="Unveil cursor and zoom demo video">
-</p>
-
 ## Dynamic webcam bubble overlays
 Add webcam footage as an overlay bubble, position it with presets or custom coordinates, mirror it, control shadow and roundness, and optionally make it react to zoom so it stays visually balanced during motion.
 
-<p>
-  <img src="./docs/media/feature2.gif" width="450" alt="Unveil webcam overlay demo video">
-</p>
-
 ## Timeline editing built for demos
 Use drag-and-drop timeline tools for zooms, trims, speed regions, annotations, extra audio regions, and crop-aware edits. Save and reopen work as `.unveil` project files (older `.recordly` files still open).
-
-<p>
-  <img width="450" alt="timeline editor" src="https://github.com/user-attachments/assets/3692bd8f-7b8d-4a93-b696-d17c828487ea" />
-</p>
 
 ## Extensions & Marketplace
 
@@ -148,17 +132,7 @@ Recordly's design includes a community-driven extension system for adding capabi
 
 # Screenshots
 
-<p align="center">
-  <img src="https://i.postimg.cc/8CrQtGJf/Screenshot-2026-04-30-at-5-11-52-pm.png" width="700" alt="Unveil recording interface screenshot">
-</p>
-
-<p align="center">
-  <img src="https://i.postimg.cc/pLSMfrTM/Screenshot-2026-04-30-at-5-11-45-pm.png" width="700" alt="Unveil editor screenshot">
-</p>
-
-<p align="center">
-  <img src="https://i.postimg.cc/Zn9VY6bg/Screenshot-2026-03-18-at-6-32-59-pm.png" width="700" alt="Unveil timeline screenshot">
-</p>
+Screenshots of Unveil's actual interface will go here once we have them — the ones previously here were Recordly's own screenshots and didn't belong in this fork's README.
 
 ---
 
