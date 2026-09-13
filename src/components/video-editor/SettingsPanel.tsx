@@ -1447,10 +1447,10 @@ export function SettingsPanel({
 
 	const wallpaperTileClass = (isSelected: boolean) =>
 		cn(
-			"group relative aspect-square w-full overflow-hidden rounded-[10px] border bg-editor-bg transition-colors duration-150",
+			"group relative aspect-square w-full overflow-hidden rounded-[12px] border bg-editor-bg transition-all duration-150 hover:scale-[1.04]",
 			isSelected
-				? "border-[#6D4FD1] bg-foreground/[0.08]"
-				: "border-foreground/10 bg-foreground/[0.045] hover:border-foreground/20 hover:bg-foreground/[0.07]",
+				? "border-[#6D4FD1] bg-foreground/[0.08] shadow-[0_0_0_3px_rgba(109,79,209,0.22)]"
+				: "border-foreground/10 bg-foreground/[0.045] hover:border-[#6D4FD1]/40 hover:bg-foreground/[0.07]",
 		);
 
 	const renderWallpaperImageTile = (

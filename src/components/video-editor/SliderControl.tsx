@@ -37,7 +37,7 @@ export const SliderControl = memo(function SliderControl({
 	onChange,
 	formatValue,
 	parseInput: _parseInput,
-	accentColor = "blue",
+	accentColor: _accentColor,
 }: SliderControlProps) {
 	const rootRef = useRef<HTMLDivElement | null>(null);
 	const valueTextRef = useRef<HTMLSpanElement | null>(null);
@@ -45,11 +45,6 @@ export const SliderControl = memo(function SliderControl({
 	const requestRef = useRef<number | null>(null);
 
 	const pct = Math.min(100, Math.max(0, ((value - min) / (max - min || 1)) * 100));
-
-	const dividerClass =
-		accentColor === "purple"
-			? "bg-foreground/95 shadow-[0_0_10px_rgba(139,92,246,0.28)]"
-			: "bg-foreground/95 shadow-[0_0_10px_rgba(109, 79, 209,0.28)]";
 
 	// Sync initial and prop-driven changes to CSS variable
 	useEffect(() => {
@@ -65,7 +60,7 @@ export const SliderControl = memo(function SliderControl({
 				return;
 			}
 
-			const normalized = clamp((clientX - (bounds.left + 3)) / (bounds.width - 6), 0, 1);
+			const normalized = clamp((clientX - (bounds.left + 8)) / (bounds.width - 16), 0, 1);
 			const rawValue = min + normalized * (max - min);
 			const nextValue = clamp(quantizeToStep(rawValue, min, step), min, max);
 			const finalValue = Number(nextValue.toFixed(6));
@@ -142,58 +137,62 @@ export const SliderControl = memo(function SliderControl({
 	);
 
 	return (
-		<div
-			ref={rootRef}
-			role="slider"
-			tabIndex={0}
-			aria-label={label}
-			aria-valuemin={min}
-			aria-valuemax={max}
-			aria-valuenow={value}
-			aria-valuetext={formatValue(value)}
-			onPointerDown={handlePointerDown}
-			onKeyDown={(event) => {
-				if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-					event.preventDefault();
-					onChange(clamp(quantizeToStep(value - step, min, step), min, max));
-				}
+		<div className="flex w-full select-none flex-col gap-1.5">
+			<div className="flex items-center justify-between px-0.5">
+				<span className="text-[11.5px] font-medium text-muted-foreground">{label}</span>
+				<span
+					ref={valueTextRef}
+					className="rounded-md bg-[#6D4FD1]/10 px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-[#6D4FD1]"
+				>
+					{formatValue(value)}
+				</span>
+			</div>
+			<div
+				ref={rootRef}
+				role="slider"
+				tabIndex={0}
+				aria-label={label}
+				aria-valuemin={min}
+				aria-valuemax={max}
+				aria-valuenow={value}
+				aria-valuetext={formatValue(value)}
+				onPointerDown={handlePointerDown}
+				onKeyDown={(event) => {
+					if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+						event.preventDefault();
+						onChange(clamp(quantizeToStep(value - step, min, step), min, max));
+					}
 
-				if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-					event.preventDefault();
-					onChange(clamp(quantizeToStep(value + step, min, step), min, max));
+					if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+						event.preventDefault();
+						onChange(clamp(quantizeToStep(value + step, min, step), min, max));
+					}
+				}}
+				className="relative flex h-4 w-full cursor-pointer select-none items-center outline-none focus-visible:[&_[data-thumb]]:ring-2"
+				style={
+					{
+						"--slider-pct": String(pct / 100),
+					} as React.CSSProperties
 				}
-			}}
-			className="relative flex h-10 w-full select-none items-center overflow-hidden rounded-xl bg-editor-bg/80 px-1.5 outline-none focus-visible:ring-1 focus-visible:ring-[#6D4FD1]/40"
-			style={
-				{
-					"--slider-pct": String(pct / 100),
-				} as React.CSSProperties
-			}
-		>
-			<div
-				className="pointer-events-none absolute inset-y-[3px] left-[3px] right-auto rounded-[10px] bg-foreground/[0.08] shadow-[0_4px_10px_0_rgba(0,0,0,0.18)] transition-none"
-				style={{
-					width: "calc(var(--slider-pct) * (100% - 6px))",
-				}}
-			/>
-			<div
-				className={cn(
-					"pointer-events-none absolute bottom-[18%] top-[18%] z-10 w-[2px] rounded-full transition-none",
-					dividerClass,
-				)}
-				style={{
-					left: "calc(var(--slider-pct) * (100% - 6px) - 6px)",
-				}}
-			/>
-			<span className="pointer-events-none relative z-10 flex-1 pl-3 text-[12px] font-medium text-muted-foreground">
-				{label}
-			</span>
-			<span
-				ref={valueTextRef}
-				className="pointer-events-none relative z-10 pr-3 text-[12px] font-medium tabular-nums text-foreground"
 			>
-				{formatValue(value)}
-			</span>
+				<div className="pointer-events-none absolute inset-x-0 h-1.5 rounded-full bg-foreground/10" />
+				<div
+					className="pointer-events-none absolute h-1.5 rounded-full bg-gradient-to-r from-[#8b6ae8] to-[#6D4FD1] transition-none"
+					style={{
+						width: "calc(8px + var(--slider-pct) * (100% - 16px))",
+					}}
+				/>
+				<div
+					data-thumb
+					className={cn(
+						"pointer-events-none absolute z-10 h-4 w-4 -translate-x-1/2 rounded-full bg-white ring-2 ring-[#6D4FD1] transition-none",
+						"shadow-[0_1px_4px_0_rgba(0,0,0,0.35)] focus-visible:ring-4 focus-visible:ring-[#6D4FD1]/40",
+					)}
+					style={{
+						left: "calc(8px + var(--slider-pct) * (100% - 16px))",
+					}}
+				/>
+			</div>
 		</div>
 	);
 });
