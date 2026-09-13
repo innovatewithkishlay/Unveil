@@ -56,19 +56,19 @@
 		--chart-3: 197 37% 24%;
 		--chart-4: 43 74% 66%;
 		--chart-5: 27 87% 67%;
-		--radius: 0.5rem;
+		--radius: 0.75rem;
 
-		/* Editor surface colors — light mode */
+		/* Editor surface colors — light mode (subtle violet tint, clearer steps) */
 		--editor-bg: 0 0% 100%;
-		--editor-header: 0 0% 97%;
-		--editor-panel: 0 0% 98%;
-		--editor-surface: 0 0% 97%;
-		--editor-surface-alt: 0 0% 95%;
+		--editor-header: 258 22% 97%;
+		--editor-panel: 258 16% 98%;
+		--editor-surface: 258 26% 94%;
+		--editor-surface-alt: 258 22% 91%;
 		--editor-dialog: 0 0% 100%;
-		--editor-dialog-alt: 0 0% 98%;
-		--editor-timeline: 220 13% 91%;
-		--editor-row: 220 13% 88%;
-		--editor-subrow: 220 13% 85%;
+		--editor-dialog-alt: 258 16% 97%;
+		--editor-timeline: 258 18% 91%;
+		--editor-row: 258 16% 88%;
+		--editor-subrow: 258 14% 85%;
 
 		/* Slider track colors — light mode */
 		--slider-track: 0 0% 0% / 0.12;
@@ -102,17 +102,17 @@
 		--chart-4: 280 65% 60%;
 		--chart-5: 340 75% 55%;
 
-		/* Editor surface colors — dark mode */
-		--editor-bg: 240 6% 7%;
-		--editor-header: 240 5% 8.5%;
-		--editor-panel: 240 5% 9%;
-		--editor-surface: 240 4% 10%;
-		--editor-surface-alt: 240 5% 11%;
-		--editor-dialog: 240 10% 3%;
-		--editor-dialog-alt: 237 9% 5%;
-		--editor-timeline: 240 6% 7%;
-		--editor-row: 240 4% 10%;
-		--editor-subrow: 240 7% 15%;
+		/* Editor surface colors — dark mode (violet-tinted, matching brand) */
+		--editor-bg: 258 12% 7%;
+		--editor-header: 258 12% 8.5%;
+		--editor-panel: 258 12% 9%;
+		--editor-surface: 258 14% 12%;
+		--editor-surface-alt: 258 16% 14%;
+		--editor-dialog: 258 18% 4%;
+		--editor-dialog-alt: 258 15% 6%;
+		--editor-timeline: 258 12% 7%;
+		--editor-row: 258 12% 10%;
+		--editor-subrow: 258 14% 15%;
 
 		/* Slider track colors — dark mode */
 		--slider-track: 0 0% 100% / 0.12;
@@ -144,6 +144,27 @@
 	body .font-mono,
 	body kbd {
 		font-family: var(--app-font-sans);
+	}
+}
+
+/* Unveil settings panel — give each setting group its own card instead of
+   one continuous flat list, without having to touch 17 individual sections. */
+@layer utilities {
+	.unveil-settings-panel > section {
+		background: hsl(var(--editor-surface) / 0.55);
+		border: 1px solid hsl(var(--border) / 0.7);
+		border-radius: calc(var(--radius) + 6px);
+		padding: 14px;
+		margin-bottom: 12px;
+		transition: border-color 0.15s ease;
+	}
+
+	.unveil-settings-panel > section:hover {
+		border-color: rgb(var(--brand-accent-rgb) / 0.25);
+	}
+
+	.unveil-settings-panel > section:last-child {
+		margin-bottom: 4px;
 	}
 }
 

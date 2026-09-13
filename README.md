@@ -1,6 +1,10 @@
 Language: EN | [简中](README.zh-CN.md)
 
 <p align="center">
+  <img width="480" alt="Unveil by Kyro Studio" src="./public/app-icons/unveil-wordmark.png" />
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/macOS%20%7C%20Windows%20%7C%20Linux-111827?style=for-the-badge" alt="macOS Windows Linux" />
   <img src="https://img.shields.io/badge/open%20source-AGPL3.0-6d4fd1?style=for-the-badge" alt="AGPL 3.0 license" />
 </p>
@@ -9,7 +13,7 @@ Language: EN | [简中](README.zh-CN.md)
 Unveil is our agency's screen recorder and editor for presenting the websites and apps we build for clients — walkthroughs, demos, and portfolio-ready showcase videos.
 Unveil is a fork of the open-source [Recordly](https://www.recordly.dev) project, adapted for our own workflow.
 
-> Logo and product screenshots coming soon — this fork doesn't reuse Recordly's branding assets.
+> Product screenshots coming soon.
 
 ---
 

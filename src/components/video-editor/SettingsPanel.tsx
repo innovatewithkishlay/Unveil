@@ -188,7 +188,8 @@ function getBackgroundTabForWallpaper(value: string): BackgroundTab {
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
 	return (
-		<p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+		<p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+			<span className="h-2.5 w-[3px] rounded-full bg-[#6D4FD1]" aria-hidden="true" />
 			{children}
 		</p>
 	);
@@ -2066,7 +2067,7 @@ export function SettingsPanel({
 		return (
 			<div className="flex-[2] w-[332px] min-w-[280px] max-w-[332px] bg-editor-panel rounded-2xl flex flex-col shadow-xl h-full overflow-hidden">
 				<div
-					className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 pb-0"
+					className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 pb-0 unveil-settings-panel"
 					style={{ scrollbarGutter: "stable" }}
 				>
 					<div className="mb-4 flex items-center gap-2">
@@ -3746,7 +3747,7 @@ export function SettingsPanel({
 	return (
 		<div className="flex-[2] w-[332px] min-w-[280px] max-w-[332px] bg-editor-panel rounded-2xl flex flex-col shadow-xl h-full overflow-hidden">
 			<div
-				className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 pb-0"
+				className="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-4 pb-0 unveil-settings-panel"
 				style={{ scrollbarGutter: "stable" }}
 			>
 				<AnimatePresence mode="wait" initial={false}>

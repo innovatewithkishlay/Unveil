@@ -1,6 +1,10 @@
 语言: [EN](README.md) | 简中
 
 <p align="center">
+  <img width="480" alt="Unveil by Kyro Studio" src="./public/app-icons/unveil-wordmark.png" />
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/macOS%20%7C%20Windows%20%7C%20Linux-111827?style=for-the-badge" alt="macOS Windows Linux" />
   <img src="https://img.shields.io/badge/open%20source-AGPL3.0-6d4fd1?style=for-the-badge" alt="AGPL 3.0 license" />
 </p>
@@ -9,7 +13,7 @@
 Unveil 是我们代理商团队用于展示所构建客户网站与应用的屏幕录制与编辑工具——操作讲解、演示、以及可直接用于作品集的展示视频。
 Unveil 是开源项目 [Recordly](https://www.recordly.dev) 的一个分支，为我们自己的工作流程而调整。
 
-> Logo 和产品截图即将推出——本分支不会使用 Recordly 的品牌素材。
+> 产品截图即将推出。
 
 ---
 
