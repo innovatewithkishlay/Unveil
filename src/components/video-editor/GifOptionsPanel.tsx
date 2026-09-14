@@ -42,10 +42,11 @@ export function GifOptionsPanel({
 	}));
 
 	return (
-		<div className="space-y-4 animate-in slide-in-from-bottom-2 duration-200">
+		<div className="space-y-3 animate-in slide-in-from-bottom-2 duration-200">
 			{/* Frame Rate */}
-			<div className="space-y-2">
-				<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+			<div className="flex flex-col gap-2 rounded-2xl border border-foreground/10 bg-editor-surface p-3.5">
+				<label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+					<span className="h-2.5 w-[3px] rounded-full bg-[#6D4FD1]" aria-hidden="true" />
 					{t("gifOptions.frameRate")}
 				</label>
 				<Select
@@ -53,16 +54,12 @@ export function GifOptionsPanel({
 					onValueChange={(value) => onFrameRateChange(Number(value) as GifFrameRate)}
 					disabled={disabled}
 				>
-					<SelectTrigger className="w-full bg-foreground/5 border-foreground/10 text-foreground hover:bg-foreground/10">
+					<SelectTrigger className="w-full">
 						<SelectValue />
 					</SelectTrigger>
-					<SelectContent className="bg-editor-surface-alt border-foreground/10 z-[100]">
+					<SelectContent>
 						{GIF_FRAME_RATES.map((rate) => (
-							<SelectItem
-								key={rate.value}
-								value={String(rate.value)}
-								className="text-foreground focus:bg-foreground/10 focus:text-foreground"
-							>
+							<SelectItem key={rate.value} value={String(rate.value)}>
 								{rate.label}
 							</SelectItem>
 						))}
@@ -71,8 +68,9 @@ export function GifOptionsPanel({
 			</div>
 
 			{/* Size Preset */}
-			<div className="space-y-2">
-				<label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+			<div className="flex flex-col gap-2 rounded-2xl border border-foreground/10 bg-editor-surface p-3.5">
+				<label className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+					<span className="h-2.5 w-[3px] rounded-full bg-[#6D4FD1]" aria-hidden="true" />
 					{t("gifOptions.outputSize")}
 				</label>
 				<Select
@@ -80,16 +78,12 @@ export function GifOptionsPanel({
 					onValueChange={(value) => onSizePresetChange(value as GifSizePreset)}
 					disabled={disabled}
 				>
-					<SelectTrigger className="w-full bg-foreground/5 border-foreground/10 text-foreground hover:bg-foreground/10">
+					<SelectTrigger className="w-full">
 						<SelectValue />
 					</SelectTrigger>
-					<SelectContent className="bg-editor-surface-alt border-foreground/10 z-[100]">
+					<SelectContent>
 						{sizePresetOptions.map((option) => (
-							<SelectItem
-								key={option.value}
-								value={option.value}
-								className="text-foreground focus:bg-foreground/10 focus:text-foreground"
-							>
+							<SelectItem key={option.value} value={option.value}>
 								{option.label}
 							</SelectItem>
 						))}
@@ -104,7 +98,7 @@ export function GifOptionsPanel({
 			</div>
 
 			{/* Loop Toggle */}
-			<div className="flex items-center justify-between py-2">
+			<div className="flex items-center justify-between rounded-2xl border border-foreground/10 bg-editor-surface p-3.5">
 				<div>
 					<label className="text-sm font-medium text-foreground">
 						{t("gifOptions.loopAnimation")}
