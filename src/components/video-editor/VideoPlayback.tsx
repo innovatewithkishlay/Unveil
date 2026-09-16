@@ -102,7 +102,11 @@ import {
 	PixiCursorOverlay,
 	preloadCursorAssets,
 } from "./videoPlayback/cursorRenderer";
-import { clampFocusToScale, computeZoomFromDrawnBox } from "./videoPlayback/focusUtils";
+import {
+	clampFocusToScale,
+	computeAspectLockedZoomBox,
+	computeZoomFromDrawnBox,
+} from "./videoPlayback/focusUtils";
 import { layoutVideoContent as layoutVideoContentUtil } from "./videoPlayback/layoutUtils";
 import { clamp01 } from "./videoPlayback/mathUtils";
 import {
@@ -455,6 +459,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const animationStateRef = useRef<PlaybackAnimationState>(createPlaybackAnimationState());
 		const isDraggingFocusRef = useRef(false);
 		const isDrawingZoomBoxRef = useRef(false);
+		const zoomBoxDrawCancelledRef = useRef(false);
 		const zoomDragStartPointRef = useRef<{ x: number; y: number } | null>(null);
 		const drawMarqueeRef = useRef<HTMLDivElement | null>(null);
 		const stageSizeRef = useRef({ width: 0, height: 0 });
@@ -1196,6 +1201,39 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const DRAW_ZOOM_BOX_THRESHOLD_PX = 10;
 		const MIN_DRAWN_ZOOM_BOX_PX = 24;
 
+		// Stable across renders (empty deps) so addEventListener/removeEventListener
+		// in handleOverlayPointerMove/endFocusDrag always pair up correctly, even
+		// if this component re-renders mid-drag.
+		const cancelZoomBoxDraw = useCallback(() => {
+			if (!isDrawingZoomBoxRef.current) return;
+			zoomBoxDrawCancelledRef.current = true;
+			if (drawMarqueeRef.current) {
+				drawMarqueeRef.current.style.display = "none";
+			}
+			const regionId = selectedZoomIdRef.current;
+			const region = regionId
+				? (zoomRegionsRef.current.find((r) => r.id === regionId) ?? null)
+				: null;
+			updateOverlayForRegion(region);
+		}, [updateOverlayForRegion]);
+
+		const handleZoomBoxDrawEscapeKey = useCallback(
+			(event: KeyboardEvent) => {
+				if (event.key === "Escape") {
+					cancelZoomBoxDraw();
+				}
+			},
+			[cancelZoomBoxDraw],
+		);
+
+		// Safety net: if this component unmounts mid-draw (e.g. switching
+		// editor panels) endFocusDrag never fires to remove the listener above.
+		useEffect(() => {
+			return () => {
+				window.removeEventListener("keydown", handleZoomBoxDrawEscapeKey);
+			};
+		}, [handleZoomBoxDrawEscapeKey]);
+
 		const updateFocusFromClientPoint = (clientX: number, clientY: number) => {
 			const overlayEl = overlayRef.current;
 			if (!overlayEl) return;
@@ -1233,11 +1271,16 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const updateDrawMarquee = (start: { x: number; y: number }, current: { x: number; y: number }) => {
 			const marqueeEl = drawMarqueeRef.current;
 			if (!marqueeEl) return;
+			const box = computeAspectLockedZoomBox(start, current, baseMaskRef.current);
+			if (!box) {
+				marqueeEl.style.display = "none";
+				return;
+			}
 			marqueeEl.style.display = "block";
-			marqueeEl.style.left = `${Math.min(start.x, current.x)}px`;
-			marqueeEl.style.top = `${Math.min(start.y, current.y)}px`;
-			marqueeEl.style.width = `${Math.abs(current.x - start.x)}px`;
-			marqueeEl.style.height = `${Math.abs(current.y - start.y)}px`;
+			marqueeEl.style.left = `${box.left}px`;
+			marqueeEl.style.top = `${box.top}px`;
+			marqueeEl.style.width = `${box.width}px`;
+			marqueeEl.style.height = `${box.height}px`;
 		};
 
 		const hideDrawMarquee = () => {
@@ -1261,22 +1304,18 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			const rect = overlayEl.getBoundingClientRect();
 			const endPoint = { x: clientX - rect.left, y: clientY - rect.top };
 
-			const boxWidthPx = Math.abs(endPoint.x - startPoint.x);
-			const boxHeightPx = Math.abs(endPoint.y - startPoint.y);
-
-			// A near-zero-size box would imply an absurd zoom multiplier - treat
-			// it as an accidental gesture rather than a deliberate selection.
-			if (boxWidthPx < MIN_DRAWN_ZOOM_BOX_PX || boxHeightPx < MIN_DRAWN_ZOOM_BOX_PX) {
+			// Same aspect-locked geometry the live marquee showed while dragging -
+			// what you saw is exactly what you get, no separate commit-time math
+			// that could disagree with the preview.
+			const box = computeAspectLockedZoomBox(startPoint, endPoint, baseMask);
+			if (!box || box.width < MIN_DRAWN_ZOOM_BOX_PX || box.height < MIN_DRAWN_ZOOM_BOX_PX) {
+				// Too small to be a deliberate selection - treat as an accidental
+				// gesture rather than a real "zoom to this" request.
 				return false;
 			}
 
 			const result = computeZoomFromDrawnBox(
-				{
-					left: Math.min(startPoint.x, endPoint.x),
-					top: Math.min(startPoint.y, endPoint.y),
-					width: boxWidthPx,
-					height: boxHeightPx,
-				},
+				box,
 				baseMask,
 				MIN_CUSTOM_ZOOM_SCALE,
 				MAX_CUSTOM_ZOOM_SCALE,
@@ -1325,13 +1364,17 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 				if (isDrawingZoomBoxRef.current || movedDistance > DRAW_ZOOM_BOX_THRESHOLD_PX) {
 					if (!isDrawingZoomBoxRef.current) {
 						isDrawingZoomBoxRef.current = true;
+						zoomBoxDrawCancelledRef.current = false;
 						// Hide the normal "resulting zoom" indicator while a new box
 						// is actively being drawn, so the two don't overlap/confuse.
 						if (focusIndicatorRef.current) {
 							focusIndicatorRef.current.style.display = "none";
 						}
+						window.addEventListener("keydown", handleZoomBoxDrawEscapeKey);
 					}
-					updateDrawMarquee(startPoint, current);
+					if (!zoomBoxDrawCancelledRef.current) {
+						updateDrawMarquee(startPoint, current);
+					}
 					return;
 				}
 			}
@@ -1344,19 +1387,26 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			isDraggingFocusRef.current = false;
 
 			if (isDrawingZoomBoxRef.current) {
-				const committed = commitDrawnZoomBox(event.clientX, event.clientY);
-				if (!committed) {
-					// Box was rejected (too small) - commitDrawnZoomBox never ran
-					// its own indicator update, so restore it to the pre-drag state
-					// ourselves (it was hidden for the whole drag).
-					const regionId = selectedZoomIdRef.current;
-					const region = regionId
-						? (zoomRegionsRef.current.find((r) => r.id === regionId) ?? null)
-						: null;
-					updateOverlayForRegion(region);
+				window.removeEventListener("keydown", handleZoomBoxDrawEscapeKey);
+
+				// Escape already restored the indicator and hid the marquee -
+				// don't commit a box the user explicitly backed out of.
+				if (!zoomBoxDrawCancelledRef.current) {
+					const committed = commitDrawnZoomBox(event.clientX, event.clientY);
+					if (!committed) {
+						// Box was rejected (too small) - commitDrawnZoomBox never ran
+						// its own indicator update, so restore it to the pre-drag
+						// state ourselves (it was hidden for the whole drag).
+						const regionId = selectedZoomIdRef.current;
+						const region = regionId
+							? (zoomRegionsRef.current.find((r) => r.id === regionId) ?? null)
+							: null;
+						updateOverlayForRegion(region);
+					}
 				}
 			}
 			isDrawingZoomBoxRef.current = false;
+			zoomBoxDrawCancelledRef.current = false;
 			zoomDragStartPointRef.current = null;
 			hideDrawMarquee();
 

@@ -65,11 +65,66 @@ export function clampFocusToStage(
 	};
 }
 
-export interface DrawnZoomBox {
+export interface ZoomBoxRect {
 	left: number;
 	top: number;
 	width: number;
 	height: number;
+}
+
+/**
+ * Given a drag from `start` to `current`, returns the box locked to the
+ * base mask's own aspect ratio and clamped to stay fully inside it - so
+ * what you see while dragging is exactly what will fill the frame after
+ * zooming, with no surprise cropping from an off-ratio selection (the
+ * "tighter of two scales" fallback in computeZoomFromDrawnBox would
+ * otherwise show more of one axis than the box you actually drew).
+ *
+ * Returns null when the base mask is degenerate or the drag hasn't moved.
+ */
+export function computeAspectLockedZoomBox(
+	start: { x: number; y: number },
+	current: { x: number; y: number },
+	baseMask: BaseMask,
+): ZoomBoxRect | null {
+	if (!baseMask.width || !baseMask.height) {
+		return null;
+	}
+
+	const dx = current.x - start.x;
+	const dy = current.y - start.y;
+	if (dx === 0 && dy === 0) {
+		return null;
+	}
+
+	const aspect = baseMask.width / baseMask.height;
+
+	// Grow to be at least as large as the drag suggests on both axes - the
+	// same "dominant axis drives the size" approach design tools use for a
+	// shift-to-constrain-aspect drag.
+	let width = Math.max(Math.abs(dx), Math.abs(dy) * aspect);
+	let height = width / aspect;
+
+	// Can't select a region bigger than the video content itself.
+	if (width > baseMask.width) {
+		width = baseMask.width;
+		height = width / aspect;
+	}
+	if (height > baseMask.height) {
+		height = baseMask.height;
+		width = height * aspect;
+	}
+
+	const signX = dx < 0 ? -1 : 1;
+	const signY = dy < 0 ? -1 : 1;
+	let left = signX >= 0 ? start.x : start.x - width;
+	let top = signY >= 0 ? start.y : start.y - height;
+
+	// Reposition (never resize) so the box stays fully inside the mask.
+	left = clamp(left, baseMask.x, baseMask.x + baseMask.width - width);
+	top = clamp(top, baseMask.y, baseMask.y + baseMask.height - height);
+
+	return { left, top, width, height };
 }
 
 export interface BaseMask {
@@ -90,7 +145,7 @@ export interface BaseMask {
  * caller should treat that as "no meaningful selection was drawn".
  */
 export function computeZoomFromDrawnBox(
-	box: DrawnZoomBox,
+	box: ZoomBoxRect,
 	baseMask: BaseMask,
 	minScale: number,
 	maxScale: number,

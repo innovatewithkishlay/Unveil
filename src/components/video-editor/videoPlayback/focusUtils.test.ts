@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeZoomFromDrawnBox } from "./focusUtils";
+import { computeAspectLockedZoomBox, computeZoomFromDrawnBox } from "./focusUtils";
 
 describe("computeZoomFromDrawnBox", () => {
 	const baseMask = { x: 0, y: 0, width: 1000, height: 500 };
@@ -97,5 +97,73 @@ describe("computeZoomFromDrawnBox", () => {
 		expect(result?.focus.cy).toBeGreaterThanOrEqual(0);
 		expect(result?.focus.cx).toBeLessThanOrEqual(1);
 		expect(result?.focus.cy).toBeLessThanOrEqual(1);
+	});
+});
+
+describe("computeAspectLockedZoomBox", () => {
+	// 2:1 aspect ratio frame, easy to reason about by hand.
+	const baseMask = { x: 0, y: 0, width: 1000, height: 500 };
+
+	it("locks the drawn box to the base mask's aspect ratio, not a free rectangle", () => {
+		// Drag suggests a box far wider (proportionally) than the frame's 2:1
+		// ratio - the result must still be exactly 2:1, using the dominant axis.
+		const result = computeAspectLockedZoomBox({ x: 100, y: 100 }, { x: 500, y: 150 }, baseMask);
+
+		expect(result).not.toBeNull();
+		expect(result!.width / result!.height).toBeCloseTo(2, 5);
+	});
+
+	it("locks to aspect ratio when the drag is proportionally taller instead", () => {
+		const result = computeAspectLockedZoomBox({ x: 100, y: 100 }, { x: 150, y: 400 }, baseMask);
+
+		expect(result).not.toBeNull();
+		expect(result!.width / result!.height).toBeCloseTo(2, 5);
+	});
+
+	it("extends in the direction the user actually drags", () => {
+		// Dragging up-and-left from the start point should produce a box whose
+		// bottom-right corner is at (or very near) the start point.
+		const start = { x: 600, y: 400 };
+		const result = computeAspectLockedZoomBox(start, { x: 550, y: 380 }, baseMask);
+
+		expect(result).not.toBeNull();
+		expect(result!.left + result!.width).toBeCloseTo(start.x, 1);
+		expect(result!.top + result!.height).toBeCloseTo(start.y, 1);
+	});
+
+	it("never produces a box that extends outside the base mask", () => {
+		// Start near the mask's edge and drag further outward than the mask
+		// allows - the box must be repositioned to stay fully inside, not
+		// clipped into an off-ratio shape.
+		const result = computeAspectLockedZoomBox({ x: 950, y: 480 }, { x: 1200, y: 700 }, baseMask);
+
+		expect(result).not.toBeNull();
+		expect(result!.left).toBeGreaterThanOrEqual(baseMask.x);
+		expect(result!.top).toBeGreaterThanOrEqual(baseMask.y);
+		expect(result!.left + result!.width).toBeLessThanOrEqual(baseMask.x + baseMask.width + 0.001);
+		expect(result!.top + result!.height).toBeLessThanOrEqual(baseMask.y + baseMask.height + 0.001);
+		expect(result!.width / result!.height).toBeCloseTo(2, 5);
+	});
+
+	it("returns null when start and current are the same point", () => {
+		expect(computeAspectLockedZoomBox({ x: 500, y: 250 }, { x: 500, y: 250 }, baseMask)).toBeNull();
+	});
+
+	it("returns null for a degenerate base mask", () => {
+		expect(
+			computeAspectLockedZoomBox({ x: 0, y: 0 }, { x: 100, y: 100 }, { x: 0, y: 0, width: 0, height: 0 }),
+		).toBeNull();
+	});
+
+	it("feeding its output into computeZoomFromDrawnBox always uses the same scale for both axes", () => {
+		// Confirms the two functions agree with each other end-to-end: an
+		// aspect-locked box should never trigger the "tighter axis" fallback
+		// in computeZoomFromDrawnBox in any meaningfully different way.
+		const box = computeAspectLockedZoomBox({ x: 200, y: 150 }, { x: 700, y: 300 }, baseMask);
+		expect(box).not.toBeNull();
+
+		const scaleForWidth = baseMask.width / box!.width;
+		const scaleForHeight = baseMask.height / box!.height;
+		expect(scaleForWidth).toBeCloseTo(scaleForHeight, 5);
 	});
 });

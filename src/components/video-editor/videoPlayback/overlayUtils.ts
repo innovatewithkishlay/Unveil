@@ -16,6 +16,7 @@ export function updateOverlayIndicator(params: OverlayUpdateParams) {
 	if (!region || region.mode === "auto") {
 		indicatorEl.style.display = "none";
 		overlayEl.style.pointerEvents = "none";
+		overlayEl.style.cursor = "";
 		return;
 	}
 
@@ -25,12 +26,14 @@ export function updateOverlayIndicator(params: OverlayUpdateParams) {
 	if (!stageWidth || !stageHeight) {
 		indicatorEl.style.display = "none";
 		overlayEl.style.pointerEvents = "none";
+		overlayEl.style.cursor = "";
 		return;
 	}
 
 	if (!baseMask.width || !baseMask.height) {
 		indicatorEl.style.display = "none";
 		overlayEl.style.pointerEvents = isPlaying ? "none" : "auto";
+		overlayEl.style.cursor = isPlaying ? "" : "crosshair";
 		return;
 	}
 
@@ -62,4 +65,5 @@ export function updateOverlayIndicator(params: OverlayUpdateParams) {
 	indicatorEl.style.left = `${adjustedLeft}px`;
 	indicatorEl.style.top = `${adjustedTop}px`;
 	overlayEl.style.pointerEvents = isPlaying ? "none" : "auto";
+	overlayEl.style.cursor = isPlaying ? "" : "crosshair";
 }
