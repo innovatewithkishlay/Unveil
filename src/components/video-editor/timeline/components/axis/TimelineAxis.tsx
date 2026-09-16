@@ -54,7 +54,7 @@ export default function TimelineAxis({ videoDurationMs, currentTimeMs }: Timelin
 
 	return (
 		<div
-			className="h-8 bg-editor-bg border-b border-foreground/10 relative overflow-hidden select-none"
+			className="h-8 bg-editor-panel border-b border-foreground/10 relative overflow-hidden select-none"
 			style={{
 				[sideProperty === "right" ? "marginRight" : "marginLeft"]: `${sidebarWidth}px`,
 			}}
@@ -64,7 +64,7 @@ export default function TimelineAxis({ videoDurationMs, currentTimeMs }: Timelin
 				return (
 					<div
 						key={`minor-${time}`}
-						className="absolute bottom-1 h-1 w-[1px] bg-foreground/5"
+						className="absolute bottom-0 h-2 w-px bg-foreground/10"
 						style={{ [sideProperty]: `${offset}px` }}
 					/>
 				);
@@ -72,6 +72,12 @@ export default function TimelineAxis({ videoDurationMs, currentTimeMs }: Timelin
 
 			{markers.markers.map((marker) => {
 				const offset = valueToPixels(marker.time - range.start);
+				// The very first marker sits at the ruler's left edge - centering
+				// it like the others would push half the label past the edge,
+				// which the container's overflow-hidden then clips clean off
+				// (this was showing "0:00" as a mangled "00"). Anchor it to the
+				// edge instead of centering only for that one marker.
+				const isEdgeMarker = offset <= 0.5;
 				const markerStyle: CSSProperties = {
 					position: "absolute",
 					bottom: 0,
@@ -80,19 +86,32 @@ export default function TimelineAxis({ videoDurationMs, currentTimeMs }: Timelin
 					flexDirection: "row",
 					alignItems: "flex-end",
 					[sideProperty]: `${offset}px`,
-					transform: direction === "rtl" ? "translateX(50%)" : "translateX(-50%)",
+					transform: isEdgeMarker
+						? "none"
+						: direction === "rtl"
+							? "translateX(50%)"
+							: "translateX(-50%)",
 				};
+				const isActive = Math.abs(marker.time - currentTimeMs) < 1;
 
 				return (
 					<div key={marker.time} style={markerStyle}>
-						<div className="flex flex-col items-center pb-1">
-							<div className="mb-1.5 h-[5px] w-[5px] rounded-full bg-foreground/30" />
+						<div
+							className={cn(
+								"flex flex-col pb-1.5",
+								isEdgeMarker ? "items-start pl-2" : "items-center",
+							)}
+						>
+							<div
+								className={cn(
+									"mb-1 w-px rounded-full transition-colors",
+									isActive ? "h-2.5 bg-[#6D4FD1]" : "h-1.5 bg-foreground/20",
+								)}
+							/>
 							<span
 								className={cn(
 									"text-[10px] font-medium tabular-nums tracking-tight",
-									Math.abs(marker.time - currentTimeMs) < 1
-										? "text-[#6D4FD1]"
-										: "text-foreground/40",
+									isActive ? "text-[#6D4FD1]" : "text-foreground/45",
 								)}
 							>
 								{marker.label}

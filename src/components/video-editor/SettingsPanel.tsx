@@ -2085,127 +2085,129 @@ export function SettingsPanel({
 	}
 
 	const frameSectionContent = (
-		<section className="flex flex-col gap-2">
-			<div className="flex items-center justify-between gap-3">
-				<SectionLabel>{tSettings("sections.frame", "Frame")}</SectionLabel>
-				<button
-					type="button"
-					onClick={resetFrameSection}
-					className="text-[10px] text-[#6D4FD1] transition-opacity hover:opacity-80"
-				>
-					{t("common.actions.reset", "Reset")}
-				</button>
-			</div>
-			<div className="flex flex-col gap-1.5">
-				<SliderControl
-					label={tSettings("effects.shadow")}
-					value={shadowIntensity}
-					defaultValue={initialEditorPreferences.shadowIntensity}
-					min={0}
-					max={1}
-					step={0.01}
-					onChange={(v) => onShadowChange?.(v)}
-					formatValue={(v) => `${Math.round(v * 100)}%`}
-					parseInput={(text) => parseFloat(text.replace(/%$/, "")) / 100}
-				/>
-				<SliderControl
-					label={tSettings("effects.radius", "Radius")}
-					value={borderRadius}
-					defaultValue={initialEditorPreferences.borderRadius}
-					min={0}
-					max={50}
-					step={0.1}
-					onChange={(v) => onBorderRadiusChange?.(v)}
-					formatValue={(v) => `${v}%`}
-					parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
-				/>
-				<div className="flex flex-col gap-1.5 pt-0.5">
-					<div className="flex items-center justify-between">
-						<SectionLabel>{tSettings("effects.padding")}</SectionLabel>
-						<button
-							type="button"
-							onClick={togglePaddingLink}
-							aria-pressed={padding.linked === false}
-							className="text-[10px] text-[#6D4FD1] transition-opacity hover:opacity-80"
-							title={
-								padding.linked === false
-									? tSettings(
-											"effects.paddingAdvancedHide",
-											"Hide advanced padding controls",
-										)
-									: tSettings(
-											"effects.paddingAdvancedShow",
-											"Show advanced padding controls",
-										)
-							}
-						>
-							{tSettings("effects.paddingAdvanced", "Advanced")}
-						</button>
-					</div>
+		<>
+			<section className="flex flex-col gap-2.5">
+				<div className="flex items-center justify-between gap-3">
+					<SectionLabel>{tSettings("sections.frame", "Frame")}</SectionLabel>
+					<button
+						type="button"
+						onClick={resetFrameSection}
+						className="text-[10px] text-[#6D4FD1] transition-opacity hover:opacity-80"
+					>
+						{t("common.actions.reset", "Reset")}
+					</button>
+				</div>
+				<div className="flex flex-col gap-2.5">
+					<SliderControl
+						label={tSettings("effects.shadow")}
+						value={shadowIntensity}
+						defaultValue={initialEditorPreferences.shadowIntensity}
+						min={0}
+						max={1}
+						step={0.01}
+						onChange={(v) => onShadowChange?.(v)}
+						formatValue={(v) => `${Math.round(v * 100)}%`}
+						parseInput={(text) => parseFloat(text.replace(/%$/, "")) / 100}
+					/>
+					<SliderControl
+						label={tSettings("effects.radius", "Radius")}
+						value={borderRadius}
+						defaultValue={initialEditorPreferences.borderRadius}
+						min={0}
+						max={50}
+						step={0.1}
+						onChange={(v) => onBorderRadiusChange?.(v)}
+						formatValue={(v) => `${v}%`}
+						parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
+					/>
+				</div>
+			</section>
+			<section className="flex flex-col gap-2.5">
+				<div className="flex items-center justify-between gap-3">
+					<SectionLabel>{tSettings("effects.padding")}</SectionLabel>
+					<button
+						type="button"
+						onClick={togglePaddingLink}
+						aria-pressed={padding.linked === false}
+						className="text-[10px] text-[#6D4FD1] transition-opacity hover:opacity-80"
+						title={
+							padding.linked === false
+								? tSettings(
+										"effects.paddingAdvancedHide",
+										"Hide advanced padding controls",
+									)
+								: tSettings(
+										"effects.paddingAdvancedShow",
+										"Show advanced padding controls",
+									)
+						}
+					>
+						{tSettings("effects.paddingAdvanced", "Advanced")}
+					</button>
+				</div>
 
-					{padding.linked !== false ? (
+				{padding.linked !== false ? (
+					<SliderControl
+						label=""
+						value={padding.top}
+						defaultValue={DEFAULT_PADDING.top}
+						min={0}
+						max={100}
+						step={1}
+						onChange={(v) => handlePaddingSideChange("top", v)}
+						formatValue={(v) => `${v}%`}
+						parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
+					/>
+				) : (
+					<div className="grid grid-cols-2 gap-x-3 gap-y-2.5">
 						<SliderControl
-							label=""
+							label={tSettings("effects.paddingTop", "Top")}
 							value={padding.top}
 							defaultValue={DEFAULT_PADDING.top}
 							min={0}
-							max={100}
+							max={ADVANCED_VERTICAL_PADDING_MAX}
 							step={1}
 							onChange={(v) => handlePaddingSideChange("top", v)}
 							formatValue={(v) => `${v}%`}
 							parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
 						/>
-					) : (
-						<div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
-							<SliderControl
-								label={tSettings("effects.paddingTop", "Top")}
-								value={padding.top}
-								defaultValue={DEFAULT_PADDING.top}
-								min={0}
-								max={ADVANCED_VERTICAL_PADDING_MAX}
-								step={1}
-								onChange={(v) => handlePaddingSideChange("top", v)}
-								formatValue={(v) => `${v}%`}
-								parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
-							/>
-							<SliderControl
-								label={tSettings("effects.paddingBottom", "Bottom")}
-								value={padding.bottom}
-								defaultValue={DEFAULT_PADDING.bottom}
-								min={0}
-								max={ADVANCED_VERTICAL_PADDING_MAX}
-								step={1}
-								onChange={(v) => handlePaddingSideChange("bottom", v)}
-								formatValue={(v) => `${v}%`}
-								parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
-							/>
-							<SliderControl
-								label={tSettings("effects.paddingLeft", "Left")}
-								value={padding.left}
-								defaultValue={DEFAULT_PADDING.left}
-								min={0}
-								max={100}
-								step={1}
-								onChange={(v) => handlePaddingSideChange("left", v)}
-								formatValue={(v) => `${v}%`}
-								parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
-							/>
-							<SliderControl
-								label={tSettings("effects.paddingRight", "Right")}
-								value={padding.right}
-								defaultValue={DEFAULT_PADDING.right}
-								min={0}
-								max={100}
-								step={1}
-								onChange={(v) => handlePaddingSideChange("right", v)}
-								formatValue={(v) => `${v}%`}
-								parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
-							/>
-						</div>
-					)}
-				</div>
-				<div className="flex items-center justify-between rounded-lg bg-foreground/[0.03] px-2.5 py-1.5">
-					<span className="text-[10px] text-muted-foreground">
+						<SliderControl
+							label={tSettings("effects.paddingBottom", "Bottom")}
+							value={padding.bottom}
+							defaultValue={DEFAULT_PADDING.bottom}
+							min={0}
+							max={ADVANCED_VERTICAL_PADDING_MAX}
+							step={1}
+							onChange={(v) => handlePaddingSideChange("bottom", v)}
+							formatValue={(v) => `${v}%`}
+							parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
+						/>
+						<SliderControl
+							label={tSettings("effects.paddingLeft", "Left")}
+							value={padding.left}
+							defaultValue={DEFAULT_PADDING.left}
+							min={0}
+							max={100}
+							step={1}
+							onChange={(v) => handlePaddingSideChange("left", v)}
+							formatValue={(v) => `${v}%`}
+							parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
+						/>
+						<SliderControl
+							label={tSettings("effects.paddingRight", "Right")}
+							value={padding.right}
+							defaultValue={DEFAULT_PADDING.right}
+							min={0}
+							max={100}
+							step={1}
+							onChange={(v) => handlePaddingSideChange("right", v)}
+							formatValue={(v) => `${v}%`}
+							parseInput={(text) => parseFloat(text.replace(/%$/, ""))}
+						/>
+					</div>
+				)}
+				<div className="flex items-center justify-between rounded-lg bg-foreground/[0.04] px-3 py-2 mt-0.5">
+					<span className="text-[11px] text-muted-foreground">
 						{tSettings("effects.removeBackground")}
 					</span>
 					<Switch
@@ -2214,8 +2216,8 @@ export function SettingsPanel({
 						className="data-[state=checked]:bg-[#6D4FD1] scale-75"
 					/>
 				</div>
-			</div>
-		</section>
+			</section>
+		</>
 	);
 
 	const cropSectionContent = (
