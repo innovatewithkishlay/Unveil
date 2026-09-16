@@ -76,11 +76,13 @@ import {
 	DEFAULT_ZOOM_OUT_DURATION_MS,
 	DEFAULT_ZOOM_OUT_EASING,
 	getDefaultCaptionFontFamily,
+	getZoomScale,
+	MAX_CUSTOM_ZOOM_SCALE,
+	MIN_CUSTOM_ZOOM_SCALE,
 	type Padding,
 	type SpeedRegion,
 	type TrimRegion,
 	type WebcamOverlaySettings,
-	type ZoomDepth,
 	type ZoomFocus,
 	type ZoomMotionBlurTuning,
 	type ZoomRegion,
@@ -100,7 +102,7 @@ import {
 	PixiCursorOverlay,
 	preloadCursorAssets,
 } from "./videoPlayback/cursorRenderer";
-import { clampFocusToStage as clampFocusToStageUtil } from "./videoPlayback/focusUtils";
+import { clampFocusToScale, computeZoomFromDrawnBox } from "./videoPlayback/focusUtils";
 import { layoutVideoContent as layoutVideoContentUtil } from "./videoPlayback/layoutUtils";
 import { clamp01 } from "./videoPlayback/mathUtils";
 import {
@@ -244,6 +246,7 @@ interface VideoPlaybackProps {
 	selectedZoomId: string | null;
 	onSelectZoom: (id: string | null) => void;
 	onZoomFocusChange: (id: string, focus: ZoomFocus) => void;
+	onZoomBoxDrawn: (id: string, focus: ZoomFocus, customScale: number) => void;
 	isPlaying: boolean;
 	showShadow?: boolean;
 	shadowIntensity?: number;
@@ -328,6 +331,7 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			selectedZoomId,
 			onSelectZoom,
 			onZoomFocusChange,
+			onZoomBoxDrawn,
 			isPlaying,
 			showShadow,
 			shadowIntensity = 0,
@@ -450,6 +454,9 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const selectedZoomIdRef = useRef<string | null>(null);
 		const animationStateRef = useRef<PlaybackAnimationState>(createPlaybackAnimationState());
 		const isDraggingFocusRef = useRef(false);
+		const isDrawingZoomBoxRef = useRef(false);
+		const zoomDragStartPointRef = useRef<{ x: number; y: number } | null>(null);
+		const drawMarqueeRef = useRef<HTMLDivElement | null>(null);
 		const stageSizeRef = useRef({ width: 0, height: 0 });
 		const videoSizeRef = useRef({ width: 0, height: 0 });
 		const baseScaleRef = useRef(1);
@@ -939,10 +946,6 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			],
 		);
 
-		const clampFocusToStage = useCallback((focus: ZoomFocus, depth: ZoomDepth) => {
-			return clampFocusToStageUtil(focus, depth, stageSizeRef.current);
-		}, []);
-
 		const updateOverlayForRegion = useCallback(
 			(region: ZoomRegion | null, focusOverride?: ZoomFocus) => {
 				const overlayEl = overlayRef.current;
@@ -1185,6 +1188,14 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			},
 		}));
 
+		// A quick click (or a tiny nudge) still just repositions the existing
+		// zoom box, exactly like before. Only once the drag travels past this
+		// distance does it become "drawing a new box" - distinguishing a nudge
+		// from a deliberate marquee-select gesture, the same way image editors
+		// tell a click apart from a drag-to-select.
+		const DRAW_ZOOM_BOX_THRESHOLD_PX = 10;
+		const MIN_DRAWN_ZOOM_BOX_PX = 24;
+
 		const updateFocusFromClientPoint = (clientX: number, clientY: number) => {
 			const overlayEl = overlayRef.current;
 			if (!overlayEl) return;
@@ -1213,10 +1224,71 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 				cx: clamp01((localX - baseMask.x) / Math.max(1, baseMask.width)),
 				cy: clamp01((localY - baseMask.y) / Math.max(1, baseMask.height)),
 			};
-			const clampedFocus = clampFocusToStage(unclampedFocus, region.depth);
+			const clampedFocus = clampFocusToScale(unclampedFocus, getZoomScale(region));
 
 			onZoomFocusChange(region.id, clampedFocus);
 			updateOverlayForRegion({ ...region, focus: clampedFocus }, clampedFocus);
+		};
+
+		const updateDrawMarquee = (start: { x: number; y: number }, current: { x: number; y: number }) => {
+			const marqueeEl = drawMarqueeRef.current;
+			if (!marqueeEl) return;
+			marqueeEl.style.display = "block";
+			marqueeEl.style.left = `${Math.min(start.x, current.x)}px`;
+			marqueeEl.style.top = `${Math.min(start.y, current.y)}px`;
+			marqueeEl.style.width = `${Math.abs(current.x - start.x)}px`;
+			marqueeEl.style.height = `${Math.abs(current.y - start.y)}px`;
+		};
+
+		const hideDrawMarquee = () => {
+			if (drawMarqueeRef.current) {
+				drawMarqueeRef.current.style.display = "none";
+			}
+		};
+
+		const commitDrawnZoomBox = (clientX: number, clientY: number) => {
+			const overlayEl = overlayRef.current;
+			const startPoint = zoomDragStartPointRef.current;
+			const regionId = selectedZoomIdRef.current;
+			const baseMask = baseMaskRef.current;
+			if (!overlayEl || !startPoint || !regionId || !baseMask.width || !baseMask.height) {
+				return false;
+			}
+
+			const region = zoomRegionsRef.current.find((r) => r.id === regionId);
+			if (!region) return false;
+
+			const rect = overlayEl.getBoundingClientRect();
+			const endPoint = { x: clientX - rect.left, y: clientY - rect.top };
+
+			const boxWidthPx = Math.abs(endPoint.x - startPoint.x);
+			const boxHeightPx = Math.abs(endPoint.y - startPoint.y);
+
+			// A near-zero-size box would imply an absurd zoom multiplier - treat
+			// it as an accidental gesture rather than a deliberate selection.
+			if (boxWidthPx < MIN_DRAWN_ZOOM_BOX_PX || boxHeightPx < MIN_DRAWN_ZOOM_BOX_PX) {
+				return false;
+			}
+
+			const result = computeZoomFromDrawnBox(
+				{
+					left: Math.min(startPoint.x, endPoint.x),
+					top: Math.min(startPoint.y, endPoint.y),
+					width: boxWidthPx,
+					height: boxHeightPx,
+				},
+				baseMask,
+				MIN_CUSTOM_ZOOM_SCALE,
+				MAX_CUSTOM_ZOOM_SCALE,
+			);
+			if (!result) return false;
+
+			onZoomBoxDrawn(region.id, result.focus, result.customScale);
+			updateOverlayForRegion(
+				{ ...region, focus: result.focus, customScale: result.customScale },
+				result.focus,
+			);
+			return true;
 		};
 
 		const handleOverlayPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -1227,6 +1299,13 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 			if (!region || region.mode !== "manual") return;
 			onSelectZoom(region.id);
 			event.preventDefault();
+
+			const overlayEl = overlayRef.current;
+			const rect = overlayEl?.getBoundingClientRect();
+			zoomDragStartPointRef.current = rect
+				? { x: event.clientX - rect.left, y: event.clientY - rect.top }
+				: null;
+			isDrawingZoomBoxRef.current = false;
 			isDraggingFocusRef.current = true;
 			event.currentTarget.setPointerCapture(event.pointerId);
 			updateFocusFromClientPoint(event.clientX, event.clientY);
@@ -1235,12 +1314,52 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 		const handleOverlayPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
 			if (!isDraggingFocusRef.current) return;
 			event.preventDefault();
+
+			const overlayEl = overlayRef.current;
+			const startPoint = zoomDragStartPointRef.current;
+			if (overlayEl && startPoint) {
+				const rect = overlayEl.getBoundingClientRect();
+				const current = { x: event.clientX - rect.left, y: event.clientY - rect.top };
+				const movedDistance = Math.hypot(current.x - startPoint.x, current.y - startPoint.y);
+
+				if (isDrawingZoomBoxRef.current || movedDistance > DRAW_ZOOM_BOX_THRESHOLD_PX) {
+					if (!isDrawingZoomBoxRef.current) {
+						isDrawingZoomBoxRef.current = true;
+						// Hide the normal "resulting zoom" indicator while a new box
+						// is actively being drawn, so the two don't overlap/confuse.
+						if (focusIndicatorRef.current) {
+							focusIndicatorRef.current.style.display = "none";
+						}
+					}
+					updateDrawMarquee(startPoint, current);
+					return;
+				}
+			}
+
 			updateFocusFromClientPoint(event.clientX, event.clientY);
 		};
 
 		const endFocusDrag = (event: React.PointerEvent<HTMLDivElement>) => {
 			if (!isDraggingFocusRef.current) return;
 			isDraggingFocusRef.current = false;
+
+			if (isDrawingZoomBoxRef.current) {
+				const committed = commitDrawnZoomBox(event.clientX, event.clientY);
+				if (!committed) {
+					// Box was rejected (too small) - commitDrawnZoomBox never ran
+					// its own indicator update, so restore it to the pre-drag state
+					// ourselves (it was hidden for the whole drag).
+					const regionId = selectedZoomIdRef.current;
+					const region = regionId
+						? (zoomRegionsRef.current.find((r) => r.id === regionId) ?? null)
+						: null;
+					updateOverlayForRegion(region);
+				}
+			}
+			isDrawingZoomBoxRef.current = false;
+			zoomDragStartPointRef.current = null;
+			hideDrawMarquee();
+
 			try {
 				event.currentTarget.releasePointerCapture(event.pointerId);
 			} catch {
@@ -2550,6 +2669,11 @@ const VideoPlayback = forwardRef<VideoPlaybackRef, VideoPlaybackProps>(
 						<div
 							ref={focusIndicatorRef}
 							className="absolute rounded-md border border-[#6D4FD1]/80 bg-[#6D4FD1]/20 shadow-[0_0_0_1px_rgba(109, 79, 209,0.35)]"
+							style={{ display: "none", pointerEvents: "none" }}
+						/>
+						<div
+							ref={drawMarqueeRef}
+							className="absolute rounded-sm border-2 border-dashed border-[#6D4FD1] bg-[#6D4FD1]/10"
 							style={{ display: "none", pointerEvents: "none" }}
 						/>
 						{webcam && webcamVideoPath ? (

@@ -65,6 +65,57 @@ export function clampFocusToStage(
 	};
 }
 
+export interface DrawnZoomBox {
+	left: number;
+	top: number;
+	width: number;
+	height: number;
+}
+
+export interface BaseMask {
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+}
+
+/**
+ * Converts a box drawn on the preview frame into the precise focus point and
+ * zoom scale needed to make that exact box fill the frame - "zoom to fit this
+ * selection", the same idea as marquee-zoom in image editors. Uses the
+ * tighter of the two axis scales so the whole drawn box stays visible after
+ * zooming, rather than cropping one edge to fill the other axis exactly.
+ *
+ * Returns null when the box or base mask is degenerate (zero-sized) - the
+ * caller should treat that as "no meaningful selection was drawn".
+ */
+export function computeZoomFromDrawnBox(
+	box: DrawnZoomBox,
+	baseMask: BaseMask,
+	minScale: number,
+	maxScale: number,
+): { focus: ZoomFocus; customScale: number } | null {
+	if (box.width <= 0 || box.height <= 0 || !baseMask.width || !baseMask.height) {
+		return null;
+	}
+
+	const centerX = box.left + box.width / 2;
+	const centerY = box.top + box.height / 2;
+	const rawFocus: ZoomFocus = {
+		cx: clamp((centerX - baseMask.x) / baseMask.width, 0, 1),
+		cy: clamp((centerY - baseMask.y) / baseMask.height, 0, 1),
+	};
+
+	const scaleForWidth = baseMask.width / box.width;
+	const scaleForHeight = baseMask.height / box.height;
+	const customScale = clamp(Math.min(scaleForWidth, scaleForHeight), minScale, maxScale);
+
+	return {
+		focus: clampFocusToScale(rawFocus, customScale),
+		customScale,
+	};
+}
+
 export function clampFocusToScale(focus: ZoomFocus, zoomScale: number): ZoomFocus {
 	const baseFocus = {
 		cx: clamp(focus.cx, 0, 1),

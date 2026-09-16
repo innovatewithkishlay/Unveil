@@ -5,8 +5,10 @@
 		"deleteZoom": "Eliminar zoom",
 		"modeAuto": "Auto",
 		"modeManual": "Manual",
-		"modeManualDescription": "Establece un punto de enfoque fijo para este zoom",
-		"modeAutoDescription": "La cámara sigue el cursor automáticamente"
+		"modeManualDescription": "Arrastra para reposicionar, o dibuja un recuadro alrededor de exactamente lo que quieres ampliar",
+		"modeAutoDescription": "La cámara sigue el cursor automáticamente",
+		"customScale": "Personalizado",
+		"customScaleHint": "Definido al dibujar un recuadro en la vista previa"
 	},
 	"trim": {
 		"deleteRegion": "Eliminar región de recorte"

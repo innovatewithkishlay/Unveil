@@ -138,13 +138,34 @@ export function useZoomRegionCommands({
 		},
 		[setZoomRegions],
 	);
+	// Drawing an exact box on the preview sets a precise, continuous zoom
+	// scale directly - bypassing the 6 fixed depth presets entirely for
+	// this region. `depth` is left untouched (used again if the user later
+	// picks a preset, which clears customScale below).
+	const handleZoomBoxDrawn = useCallback(
+		(id: string, focus: ZoomFocus, customScale: number) => {
+			setZoomRegions((current) =>
+				current.map((region) =>
+					region.id === id ? { ...region, focus, customScale, mode: "manual" } : region,
+				),
+			);
+		},
+		[setZoomRegions],
+	);
 	const handleZoomDepthChange = useCallback(
 		(depth: ZoomDepth) => {
 			if (!selectedZoomId) return;
 			setZoomRegions((current) =>
 				current.map((region) =>
 					region.id === selectedZoomId
-						? { ...region, depth, focus: clampFocusToDepth(region.focus, depth) }
+						? {
+								...region,
+								depth,
+								// Picking a preset depth is a deliberate "go back to
+								// standard zoom levels" action - clear any drawn box.
+								customScale: undefined,
+								focus: clampFocusToDepth(region.focus, depth),
+							}
 						: region,
 				),
 			);
@@ -176,6 +197,7 @@ export function useZoomRegionCommands({
 		handleZoomSuggested,
 		handleZoomSpanChange,
 		handleZoomFocusChange,
+		handleZoomBoxDrawn,
 		handleZoomDepthChange,
 		handleZoomModeChange,
 		handleZoomDelete,

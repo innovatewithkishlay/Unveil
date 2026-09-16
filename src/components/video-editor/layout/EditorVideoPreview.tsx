@@ -11,6 +11,7 @@ type Handlers = Pick<
 	PlaybackProps,
 	| "onSelectZoom"
 	| "onZoomFocusChange"
+	| "onZoomBoxDrawn"
 	| "onEditAutoCaption"
 	| "onSelectAnnotation"
 	| "onAnnotationPositionChange"

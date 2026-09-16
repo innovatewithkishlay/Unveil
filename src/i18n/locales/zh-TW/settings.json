@@ -5,8 +5,10 @@
 		"deleteZoom": "刪除縮放",
 		"modeAuto": "自動",
 		"modeManual": "手動",
-		"modeManualDescription": "為此縮放設定固定的對焦點",
-		"modeAutoDescription": "相機會自動跟隨游標"
+		"modeManualDescription": "拖曳以重新定位，或在預覽畫面上畫一個方框，精確框選你想放大的內容",
+		"modeAutoDescription": "相機會自動跟隨游標",
+		"customScale": "自訂",
+		"customScaleHint": "透過在預覽上繪製方框來設定"
 	},
 	"trim": {
 		"deleteRegion": "刪除修剪區域"

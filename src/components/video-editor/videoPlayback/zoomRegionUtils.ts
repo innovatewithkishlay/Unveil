@@ -1,5 +1,5 @@
 import type { ZoomFocus, ZoomRegion } from "../types";
-import { ZOOM_DEPTH_SCALES } from "../types";
+import { getZoomScale } from "../types";
 import {
 	TRANSITION_WINDOW_MS,
 	ZOOM_IN_TRANSITION_WINDOW_MS,
@@ -154,7 +154,7 @@ function getActiveRegion(
 	}
 
 	const activeRegion = activeRegions[0].region;
-	const activeScale = ZOOM_DEPTH_SCALES[activeRegion.depth];
+	const activeScale = getZoomScale(activeRegion);
 
 	return {
 		region: {
@@ -169,7 +169,7 @@ function getActiveRegion(
 function getConnectedRegionHold(timeMs: number, connectedPairs: ConnectedRegionPair[]) {
 	for (const pair of connectedPairs) {
 		if (timeMs >= pair.transitionEnd && timeMs < pair.nextRegion.startMs) {
-			const nextScale = ZOOM_DEPTH_SCALES[pair.nextRegion.depth];
+			const nextScale = getZoomScale(pair.nextRegion);
 			return {
 				region: {
 					...pair.nextRegion,

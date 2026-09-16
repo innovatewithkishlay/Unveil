@@ -202,6 +202,7 @@ export function EditorPreviewPanel(props: Props) {
 									handlers={{
 										onSelectZoom: zoomCommands.handleSelectZoom,
 										onZoomFocusChange: zoomCommands.handleZoomFocusChange,
+										onZoomBoxDrawn: zoomCommands.handleZoomBoxDrawn,
 										onEditAutoCaption: handleSaveAutoCaptionEdit,
 										onSelectAnnotation: handleSelectAnnotation,
 										onAnnotationPositionChange:

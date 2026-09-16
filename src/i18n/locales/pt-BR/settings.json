@@ -5,8 +5,10 @@
 		"deleteZoom": "Excluir zoom",
 		"modeAuto": "Auto",
 		"modeManual": "Manual",
-		"modeManualDescription": "Defina um ponto de foco fixo para este zoom",
-		"modeAutoDescription": "A câmera segue o cursor automaticamente"
+		"modeManualDescription": "Arraste para reposicionar, ou desenhe uma caixa exatamente ao redor do que você quer ampliar",
+		"modeAutoDescription": "A câmera segue o cursor automaticamente",
+		"customScale": "Personalizado",
+		"customScaleHint": "Definido ao desenhar uma caixa na pré-visualização"
 	},
 	"trim": {
 		"deleteRegion": "Excluir região de corte"

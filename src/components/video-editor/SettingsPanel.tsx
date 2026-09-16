@@ -515,6 +515,7 @@ interface SettingsPanelProps {
 	selected: string;
 	onWallpaperChange: (path: string) => void;
 	selectedZoomDepth?: ZoomDepth | null;
+	selectedZoomCustomScale?: number | null;
 	onZoomDepthChange?: (depth: ZoomDepth) => void;
 	selectedZoomId?: string | null;
 	selectedZoomMode?: ZoomMode | null;
@@ -975,6 +976,7 @@ export function SettingsPanel({
 	selected,
 	onWallpaperChange,
 	selectedZoomDepth,
+	selectedZoomCustomScale,
 	onZoomDepthChange,
 	selectedZoomId,
 	selectedZoomMode,
@@ -2862,14 +2864,27 @@ export function SettingsPanel({
 					<>
 						<div className="flex items-center justify-between gap-3">
 							<SectionLabel>{tSettings("sections.zoom", "Zoom")}</SectionLabel>
-							{selectedZoomDepth && (
-								<span className="rounded-full bg-[#6D4FD1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#6D4FD1]">
-									{
-										ZOOM_DEPTH_OPTIONS.find(
-											(o) => o.depth === selectedZoomDepth,
-										)?.label
-									}
+							{selectedZoomCustomScale ? (
+								<span
+									className="rounded-full bg-[#6D4FD1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#6D4FD1]"
+									title={tSettings(
+										"zoom.customScaleHint",
+										"Set by drawing a box on the preview",
+									)}
+								>
+									{tSettings("zoom.customScale", "Custom")} ·{" "}
+									{selectedZoomCustomScale.toFixed(1)}×
 								</span>
+							) : (
+								selectedZoomDepth && (
+									<span className="rounded-full bg-[#6D4FD1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-[#6D4FD1]">
+										{
+											ZOOM_DEPTH_OPTIONS.find(
+												(o) => o.depth === selectedZoomDepth,
+											)?.label
+										}
+									</span>
+								)
 							)}
 						</div>
 						<div className="mb-1">
@@ -2903,7 +2918,7 @@ export function SettingsPanel({
 								{selectedZoomMode === "manual"
 									? tSettings(
 											"zoom.modeManualDescription",
-											"Set a fixed focus point for this zoom",
+											"Drag to reposition, or draw a box around exactly what you want to zoom into",
 										)
 									: tSettings(
 											"zoom.modeAutoDescription",
@@ -2913,7 +2928,11 @@ export function SettingsPanel({
 						</div>
 						<div className="grid grid-cols-6 gap-1.5">
 							{ZOOM_DEPTH_OPTIONS.map((option) => {
-								const isActive = selectedZoomDepth === option.depth;
+								// While a custom drawn box is active, none of the fixed
+								// presets reflect the true zoom amount - don't highlight
+								// one as if it were selected.
+								const isActive =
+									!selectedZoomCustomScale && selectedZoomDepth === option.depth;
 								return (
 									<Button
 										key={option.depth}

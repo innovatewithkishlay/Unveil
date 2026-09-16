@@ -5,8 +5,10 @@
 		"deleteZoom": "Zoom verwijderen",
 		"modeAuto": "Auto",
 		"modeManual": "Handmatig",
-		"modeManualDescription": "Stel een vast focuspunt in voor deze zoom",
-		"modeAutoDescription": "De camera volgt de cursor automatisch"
+		"modeManualDescription": "Sleep om te verplaatsen, of teken een kader precies om wat je wilt inzoomen",
+		"modeAutoDescription": "De camera volgt de cursor automatisch",
+		"customScale": "Aangepast",
+		"customScaleHint": "Ingesteld door een kader op de voorvertoning te tekenen"
 	},
 	"trim": {
 		"deleteRegion": "Trimgebied verwijderen"

@@ -5,8 +5,10 @@
 		"deleteZoom": "Supprimer le zoom",
 		"modeAuto": "Automatique",
 		"modeManual": "Manuel",
-		"modeManualDescription": "Définir un point de focus fixe pour ce zoom",
-		"modeAutoDescription": "La caméra suit automatiquement le curseur"
+		"modeManualDescription": "Faites glisser pour repositionner, ou dessinez un cadre exactement autour de ce que vous voulez zoomer",
+		"modeAutoDescription": "La caméra suit automatiquement le curseur",
+		"customScale": "Personnalisé",
+		"customScaleHint": "Défini en dessinant un cadre sur l'aperçu"
 	},
 	"trim": {
 		"deleteRegion": "Supprimer la zone de découpe"

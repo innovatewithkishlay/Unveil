@@ -14,6 +14,31 @@ export interface ZoomRegion {
 	depth: ZoomDepth;
 	focus: ZoomFocus;
 	mode?: ZoomMode;
+	/**
+	 * A precise zoom multiplier set by drawing an exact box on the preview
+	 * frame, overriding the depth preset's fixed scale. `depth` is kept
+	 * as-is (for the preset picker UI and as a fallback) even when this is
+	 * set - it's simply not used for the actual zoom amount while present.
+	 * Undefined for every region created before this feature existed, and
+	 * for any region using a plain depth preset - fully backward compatible.
+	 */
+	customScale?: number;
+}
+
+export const MIN_CUSTOM_ZOOM_SCALE = 1.05;
+export const MAX_CUSTOM_ZOOM_SCALE = 8;
+
+/** The effective zoom multiplier for a region: a drawn custom box takes
+ * priority over the region's depth preset when present. */
+export function getZoomScale(region: Pick<ZoomRegion, "depth" | "customScale">): number {
+	if (
+		typeof region.customScale === "number" &&
+		Number.isFinite(region.customScale) &&
+		region.customScale > 1
+	) {
+		return region.customScale;
+	}
+	return ZOOM_DEPTH_SCALES[region.depth];
 }
 
 export interface CursorTelemetryPoint {

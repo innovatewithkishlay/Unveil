@@ -63,6 +63,8 @@ import {
 	DEFAULT_WEBCAM_SIZE,
 	DEFAULT_WEBCAM_TIME_OFFSET_MS,
 	DEFAULT_ZOOM_DEPTH,
+	MAX_CUSTOM_ZOOM_SCALE,
+	MIN_CUSTOM_ZOOM_SCALE,
 	DEFAULT_ZOOM_IN_EASING,
 	DEFAULT_ZOOM_IN_OVERLAP_MS,
 	DEFAULT_ZOOM_MOTION_BLUR,
@@ -492,6 +494,10 @@ export function normalizeProjectEditor(editor: Partial<ProjectEditorState>): Pro
 						mode:
 							region.mode === "auto" || region.mode === "manual"
 								? region.mode
+								: undefined,
+						customScale:
+							isFiniteNumber(region.customScale) && region.customScale > 1
+								? clamp(region.customScale, MIN_CUSTOM_ZOOM_SCALE, MAX_CUSTOM_ZOOM_SCALE)
 								: undefined,
 					};
 				})

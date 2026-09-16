@@ -5,8 +5,10 @@
 		"deleteZoom": "확대 삭제",
 		"modeAuto": "자동",
 		"modeManual": "수동",
-		"modeManualDescription": "이 확대에 고정 초점을 설정합니다",
-		"modeAutoDescription": "카메라가 커서를 자동으로 따라갑니다"
+		"modeManualDescription": "드래그하여 위치를 조정하거나, 확대하고 싶은 부분을 정확히 감싸는 상자를 그려보세요",
+		"modeAutoDescription": "카메라가 커서를 자동으로 따라갑니다",
+		"customScale": "사용자 지정",
+		"customScaleHint": "미리보기에 상자를 그려서 설정됨"
 	},
 	"trim": {
 		"deleteRegion": "트림 구간 삭제"

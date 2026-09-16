@@ -1,5 +1,5 @@
 import type { CursorTelemetryPoint, ZoomFocus, ZoomRegion } from "../types";
-import { ZOOM_DEPTH_SCALES } from "../types";
+import { getZoomScale } from "../types";
 import { DEFAULT_FOCUS } from "./constants";
 import {
 	type CursorFollowCameraState,
@@ -86,7 +86,7 @@ export function resolveSceneZoomTarget({
 		return { scale: 1, focus: DEFAULT_FOCUS, progress: 0 };
 	}
 
-	const scale = blendedScale ?? ZOOM_DEPTH_SCALES[region.depth];
+	const scale = blendedScale ?? getZoomScale(region);
 	let focus = region.focus;
 	if (
 		!zoomClassicMode &&

@@ -5,8 +5,10 @@
 		"deleteZoom": "Elimina zoom",
 		"modeAuto": "Auto",
 		"modeManual": "Manuale",
-		"modeManualDescription": "Imposta un punto focale fisso per questo zoom",
-		"modeAutoDescription": "La camera si ricentra quando il cursore si avvicina al bordo della vista zoomata"
+		"modeManualDescription": "Trascina per riposizionare, oppure disegna un riquadro esattamente attorno a ciò su cui vuoi ingrandire",
+		"modeAutoDescription": "La camera si ricentra quando il cursore si avvicina al bordo della vista zoomata",
+		"customScale": "Personalizzato",
+		"customScaleHint": "Impostato disegnando un riquadro sull'anteprima"
 	},
 	"trim": {
 		"deleteRegion": "Elimina regione di taglio"

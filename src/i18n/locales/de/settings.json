@@ -5,8 +5,10 @@
 		"deleteZoom": "Zoom löschen",
 		"modeAuto": "Automatisch",
 		"modeManual": "Manuell",
-		"modeManualDescription": "Legen Sie einen festen Fokuspunkt für diesen Zoom fest",
-		"modeAutoDescription": "Die Kamera zentriert sich neu, wenn sich der Cursor dem Rand der gezoomten Ansicht nähert"
+		"modeManualDescription": "Ziehen, um zu verschieben, oder ein Rechteck um genau das zeichnen, worauf du zoomen möchtest",
+		"modeAutoDescription": "Die Kamera zentriert sich neu, wenn sich der Cursor dem Rand der gezoomten Ansicht nähert",
+		"customScale": "Benutzerdefiniert",
+		"customScaleHint": "Durch Zeichnen eines Rechtecks in der Vorschau festgelegt"
 	},
 	"trim": {
 		"deleteRegion": "Trimmbereich löschen"
