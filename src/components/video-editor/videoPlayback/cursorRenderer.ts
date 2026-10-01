@@ -125,6 +125,13 @@ const CURSOR_SHADOW_OFFSET_X = 0;
 const CURSOR_SHADOW_OFFSET_Y = 2;
 const CURSOR_SHADOW_BLUR = 3;
 const CURSOR_SHADOW_PADDING = 12;
+// How long the cursor must sit still (no movement, no click) before it
+// starts fading out, and how long the fade-out itself takes. Coming back
+// (movement or a click) snaps the cursor to fully visible immediately -
+// only hiding is gradual, so it never feels like it's lagging behind input.
+const CURSOR_IDLE_FADE_DELAY_MS = 700;
+const CURSOR_IDLE_FADE_DURATION_MS = 450;
+const CURSOR_IDLE_MOVEMENT_EPSILON = 0.002;
 const MIN_RASTERIZED_CURSOR_HEIGHT = 512;
 const NATIVE_CURSOR_ATLAS_DRAW_HEIGHT = 256;
 const NATIVE_CURSOR_ATLAS_PADDING = 2;
@@ -764,6 +771,69 @@ function findLatestSample(samples: CursorTelemetryPoint[], timeMs: number) {
 	return samples[lo]?.timeMs <= timeMs ? samples[lo] : null;
 }
 
+function findLatestSampleIndex(samples: CursorTelemetryPoint[], timeMs: number): number {
+	if (samples.length === 0) return -1;
+
+	let lo = 0;
+	let hi = samples.length - 1;
+	while (lo < hi) {
+		const mid = Math.ceil((lo + hi) / 2);
+		if (samples[mid].timeMs <= timeMs) {
+			lo = mid;
+		} else {
+			hi = mid - 1;
+		}
+	}
+
+	return samples[lo]?.timeMs <= timeMs ? lo : -1;
+}
+
+// Telemetry samples at a fixed interval regardless of whether the cursor is
+// actually moving, so "idle" isn't "no samples" - it's a run of samples that
+// stayed within noise distance of each other. Walk backward from the current
+// sample while position stays essentially unchanged to find when it settled.
+function findCursorStationarySinceMs(samples: CursorTelemetryPoint[], atIndex: number): number {
+	const reference = samples[atIndex];
+	let index = atIndex;
+	while (index > 0) {
+		const prev = samples[index - 1];
+		const dx = prev.cx - reference.cx;
+		const dy = prev.cy - reference.cy;
+		if (Math.hypot(dx, dy) > CURSOR_IDLE_MOVEMENT_EPSILON) {
+			break;
+		}
+		index -= 1;
+	}
+	return samples[index].timeMs;
+}
+
+/**
+ * Fades the cursor out after it's been stationary (and click-free) for a
+ * while, and snaps it back the instant it moves or clicks again - keeps a
+ * steady cursor from sitting on screen as a constant visual distraction.
+ */
+export function computeCursorIdleAlpha(
+	samples: CursorTelemetryPoint[],
+	timeMs: number,
+	latestClickTimeMs: number | undefined,
+): number {
+	const latestIndex = findLatestSampleIndex(samples, timeMs);
+	if (latestIndex < 0) {
+		return 1;
+	}
+
+	const stationarySinceMs = findCursorStationarySinceMs(samples, latestIndex);
+	const lastActivityMs = Math.max(stationarySinceMs, latestClickTimeMs ?? -Infinity);
+	const idleAgeMs = Math.max(0, timeMs - lastActivityMs);
+
+	if (idleAgeMs <= CURSOR_IDLE_FADE_DELAY_MS) {
+		return 1;
+	}
+
+	const fadeProgress = (idleAgeMs - CURSOR_IDLE_FADE_DELAY_MS) / CURSOR_IDLE_FADE_DURATION_MS;
+	return clamp(1 - fadeProgress, 0, 1);
+}
+
 function findLatestInteractionSample(samples: CursorTelemetryPoint[], timeMs: number) {
 	for (let index = samples.length - 1; index >= 0; index -= 1) {
 		const sample = samples[index];
@@ -1029,6 +1099,7 @@ function getCursorVisualState(
 			clickEffectAgeMs <= clickEffectDurationMs
 				? 1 - clickEffectAgeMs / clickEffectDurationMs
 				: 0,
+		idleAlpha: computeCursorIdleAlpha(samples, timeMs, latestClick?.timeMs),
 	};
 }
 
@@ -1361,7 +1432,7 @@ export class PixiCursorOverlay {
 		const h =
 			this.config.dotRadius *
 			getCursorViewportScale(viewport.width, this.config.minViewportScale);
-		const { cursorType, clickSample, clickBounceProgress, clickProgress } =
+		const { cursorType, clickSample, clickBounceProgress, clickProgress, idleAlpha } =
 			getCursorVisualState(
 				samples,
 				timeMs,
@@ -1487,6 +1558,7 @@ export class PixiCursorOverlay {
 			}
 
 			if (shadowSprite) {
+				shadowSprite.alpha = CURSOR_SHADOW_ALPHA * idleAlpha;
 				shadowSprite.height = scaledH * bounceScale;
 				shadowSprite.width = scaledH * bounceScale * asset.aspectRatio;
 				shadowSprite.position.set(px + CURSOR_SHADOW_OFFSET_X, py + CURSOR_SHADOW_OFFSET_Y);
@@ -1494,7 +1566,7 @@ export class PixiCursorOverlay {
 			}
 
 			if (sprite) {
-				sprite.alpha = this.config.dotAlpha;
+				sprite.alpha = this.config.dotAlpha * idleAlpha;
 				sprite.height = scaledH * bounceScale;
 				sprite.width = scaledH * bounceScale * asset.aspectRatio;
 				sprite.position.set(px, py);
@@ -1517,6 +1589,7 @@ export class PixiCursorOverlay {
 			this.customCursorShadowSprite.anchor.set(asset.anchorX, asset.anchorY);
 			this.customCursorShadowSprite.visible = showSeparateShadow;
 			if (showSeparateShadow) {
+				this.customCursorShadowSprite.alpha = CURSOR_SHADOW_ALPHA * idleAlpha;
 				this.customCursorShadowSprite.height = scaledH * bounceScale;
 				this.customCursorShadowSprite.width = scaledH * bounceScale * asset.aspectRatio;
 				this.customCursorShadowSprite.position.set(
@@ -1529,7 +1602,7 @@ export class PixiCursorOverlay {
 			this.customCursorSprite.texture = asset.texture;
 			this.customCursorSprite.anchor.set(asset.anchorX, asset.anchorY);
 			this.customCursorSprite.visible = true;
-			this.customCursorSprite.alpha = this.config.dotAlpha;
+			this.customCursorSprite.alpha = this.config.dotAlpha * idleAlpha;
 			this.customCursorSprite.height = scaledH * bounceScale;
 			this.customCursorSprite.width = scaledH * bounceScale * asset.aspectRatio;
 			this.customCursorSprite.position.set(px, py);
@@ -1656,12 +1729,13 @@ export function drawCursorOnCanvas(
 	const px = viewport.x + smoothedState.x * viewport.width;
 	const py = viewport.y + smoothedState.y * viewport.height;
 	const h = config.dotRadius * getCursorViewportScale(viewport.width, config.minViewportScale);
-	const { cursorType, clickSample, clickBounceProgress, clickProgress } = getCursorVisualState(
-		samples,
-		timeMs,
-		config.clickBounceDuration,
-		config.clickEffectDurationMs,
-	);
+	const { cursorType, clickSample, clickBounceProgress, clickProgress, idleAlpha } =
+		getCursorVisualState(
+			samples,
+			timeMs,
+			config.clickBounceDuration,
+			config.clickEffectDurationMs,
+		);
 	const projectedClickSample = clickSample
 		? projectCursorPositionToViewport(clickSample, viewport.sourceCrop)
 		: null;
@@ -1707,7 +1781,7 @@ export function drawCursorOnCanvas(
 	const drawWidth = drawHeight * asset.aspectRatio;
 	const hotspotX = asset.anchorX * drawWidth;
 	const hotspotY = asset.anchorY * drawHeight;
-	ctx.globalAlpha = config.dotAlpha;
+	ctx.globalAlpha = config.dotAlpha * idleAlpha;
 	ctx.drawImage(asset.image, px - hotspotX, py - hotspotY, drawWidth, drawHeight);
 
 	ctx.restore();
